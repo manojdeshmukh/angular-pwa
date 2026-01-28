@@ -69,6 +69,51 @@ Serve the `dist/angular-pwa-app` folder over HTTPS (or `http://localhost`) to te
 - `src/app/services/sync.service.ts` – synchronization and background sync logic
 - `ngsw-config.json` – Angular service worker configuration
 
+### Technical Details
+
+#### Service Worker & Caching
+
+- **Registration**: The Angular service worker is enabled via `ServiceWorkerModule` in `app.config.ts` and only runs in production builds.
+- **Static asset caching**: `ngsw-config.json` defines asset groups for application shell files (JS, CSS, HTML, icons) so the app loads reliably even when offline.
+- **Data caching (optional)**: API calls can be configured via `dataGroups` in `ngsw-config.json` for stale-while-revalidate or performance caching patterns.
+- **Update behavior**: When a new version is deployed, the service worker downloads it in the background and activates on the next reload (standard Angular SW behavior).
+
+#### Offline Storage (IndexedDB)
+
+- `OfflineStorageService` abstracts IndexedDB operations so the rest of the app works with TypeScript models instead of raw DB APIs.
+- New submissions are stored locally when:
+  - The device is offline, or
+  - An API call fails (network error or non-2xx status that should be retried).
+- Each record tracks essential metadata (form payload plus flags such as “pending sync”) to allow safe retries.
+
+#### Sync & Retry Logic
+
+- `SyncService` coordinates:
+  - Reading pending submissions from `OfflineStorageService`.
+  - Sending them to the backend via `ApiService`.
+  - Marking successfully synced items and cleaning them up locally.
+- Sync triggers:
+  - **Manual**: A “Sync now” action from the UI.
+  - **Automatic**: On app startup, when connectivity is restored, and/or on a timer interval.
+- Failures during sync fail **gracefully**:
+  - Failed items remain pending in IndexedDB.
+  - A later sync attempt can safely retry without data loss.
+
+#### Connectivity Detection
+
+- A dedicated `ConnectivityService` wraps `window.navigator.onLine` and online/offline browser events.
+- Components and services can subscribe to an observable to:
+  - Update UI state (e.g., show “Offline” banners or disable certain actions).
+  - Trigger automatic sync when transitioning from offline → online.
+
+#### API Integration
+
+- `ApiService` encapsulates all HTTP calls to the backend (JSONPlaceholder in this demo).
+- The rest of the app calls `ApiService` rather than `HttpClient` directly, which:
+  - Centralizes error handling and logging.
+  - Makes it easier to swap APIs or backends later.
+  - Simplifies testing and mocking.
+
 ### License
 
 This project is provided for learning and demo purposes. Adapt and reuse as needed.
