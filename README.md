@@ -1,57 +1,74 @@
-# Angular 18 PWA Form
+## Angular 18 PWA Form
 
-A sample Angular 18 Progressive Web App that supports:
+An Angular 18 Progressive Web App demonstrating offline-first form submission with background sync and photo attachments.
 
-- **Form submission** – title, body, and optional photos
-- **Photo capture** – take photos with the device camera
-- **Gallery selection** – pick images from the device gallery
-- **Offline support** – form data stored in IndexedDB when offline
-- **Sync with API** – syncs to [JSONPlaceholder](https://jsonplaceholder.typicode.com) when online (dummy API for demo)
+### Features
 
-## Setup
+- **Form submission**: Capture `title`, `body`, and optional photos.
+- **Photo capture**: Use the device camera to take pictures.
+- **Gallery selection**: Pick existing images from the device gallery.
+- **Offline support**: Store submissions in IndexedDB when offline.
+- **Background sync**: Automatically syncs pending submissions when back online.
+- **Submissions list**: View all synced and pending submissions.
+
+### Tech Stack
+
+- **Framework**: Angular 18 with standalone components and reactive forms
+- **PWA**: `@angular/service-worker`, `manifest.webmanifest`, `ngsw-config.json`
+- **Storage**: IndexedDB for offline data
+- **API**: [JSONPlaceholder](https://jsonplaceholder.typicode.com) as a demo REST backend
+
+### Getting Started
+
+#### Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- npm 9+
+
+#### Install dependencies
 
 ```bash
 npm install
 ```
 
-If the build fails with `Cannot find module '@angular/service-worker'`, install it explicitly:
+If you see `Cannot find module '@angular/service-worker'`, install it explicitly:
 
 ```bash
 npm install @angular/service-worker
 ```
 
-## Development
+#### Run in development
 
 ```bash
 npm start
 ```
 
-Open `http://localhost:4200`. The service worker is **disabled** in development.
+Then open `http://localhost:4200` in your browser.  
+The service worker is **disabled** in development mode.
 
-## PWA build
+### Build as PWA
 
 ```bash
 npm run build
 ```
 
-Production build outputs to `dist/angular-pwa-app/` and includes:
+The production build is emitted to `dist/angular-pwa-app/` and includes:
 
 - `ngsw-worker.js` – Angular service worker
 - `ngsw.json` – service worker manifest
 - `manifest.webmanifest` – PWA manifest
 
-Serve the `dist/angular-pwa-app` folder over HTTPS (or `localhost`) to test the PWA and service worker.
+Serve the `dist/angular-pwa-app` folder over HTTPS (or `http://localhost`) to test installability and offline behavior.
 
-## Features
+### Project Structure (high level)
 
-- **Form**: Submit title, body, and add photos via **Take photo** (camera) or **Choose from gallery**.
-- **Offline**: Submissions are saved locally when offline and synced automatically when back online.
-- **Submissions**: View all submissions (synced vs pending) on the Submissions page.
-- **Sync**: Manual **Sync now** in the header when online; automatic sync on interval and when coming online.
+- `src/app/components/form` – main form for creating submissions
+- `src/app/components/submissions-list` – list of existing and pending submissions
+- `src/app/services/api.service.ts` – HTTP calls to the backend API
+- `src/app/services/offline-storage.service.ts` – IndexedDB storage layer
+- `src/app/services/sync.service.ts` – synchronization and background sync logic
+- `ngsw-config.json` – Angular service worker configuration
 
-## Tech stack
+### License
 
-- Angular 18, standalone components, reactive forms
-- `@angular/service-worker` for PWA
-- IndexedDB for offline storage
-- JSONPlaceholder as dummy REST API
+This project is provided for learning and demo purposes. Adapt and reuse as needed.
