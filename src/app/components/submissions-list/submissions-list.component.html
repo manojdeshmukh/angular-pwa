@@ -1,0 +1,39 @@
+<section class="list-card">
+  <div class="list-header">
+    <h2>Submissions</h2>
+    <button type="button" class="btn-refresh" (click)="load()" [disabled]="loading()" aria-label="Refresh">
+      {{ loading() ? '…' : 'Refresh' }}
+    </button>
+  </div>
+  @if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else if (submissions().length === 0) {
+    <p class="muted">No submissions yet.</p>
+  } @else {
+    <ul class="submissions">
+      @for (s of submissions(); track s.id) {
+        <li class="item" [class.synced]="s.synced">
+          <div class="item-header">
+            <strong>{{ s.title || '(No title)' }}</strong>
+            <span class="badge" [class.pending]="!s.synced" [class.synced]="s.synced">
+              {{ s.synced ? 'Synced' : 'Pending' }}
+            </span>
+          </div>
+          @if (s.body) {
+            <p class="body">{{ s.body }}</p>
+          }
+          @if (s.imageDataUrls.length) {
+            <div class="thumbnails">
+              @for (url of s.imageDataUrls.slice(0, 3); track url) {
+                <img [src]="url" alt="" class="thumb" />
+              }
+              @if (s.imageDataUrls.length > 3) {
+                <span class="more">+{{ s.imageDataUrls.length - 3 }}</span>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

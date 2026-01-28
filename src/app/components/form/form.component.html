@@ -1,0 +1,74 @@
+<section class="form-card">
+  <h2>Submit a post</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="title">Title</label>
+      <input id="title" type="text" formControlName="title" placeholder="Enter title" />
+      @if (form.get('title')?.invalid && form.get('title')?.touched) {
+        <span class="error">Title is required.</span>
+      }
+    </div>
+    <div class="field">
+      <label for="body">Body</label>
+      <textarea id="body" formControlName="body" placeholder="Enter description" rows="4"></textarea>
+    </div>
+
+    <div class="images-section">
+      <label>Photos</label>
+      <div class="image-actions">
+        <button type="button" class="btn btn-secondary" (click)="triggerCamera()" [disabled]="submitting">
+          Take photo
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="triggerGallery()" [disabled]="submitting">
+          Choose from gallery
+        </button>
+      </div>
+      <input
+        #galleryInput
+        type="file"
+        accept="image/*"
+        multiple
+        (change)="onGalleryChange($event)"
+        hidden
+      />
+      @if (cameraActive) {
+        <div class="camera-modal" role="dialog" aria-label="Camera">
+          <div class="camera-modal-backdrop" (click)="closeCamera()"></div>
+          <div class="camera-modal-content">
+            <video #cameraVideo autoplay playsinline muted></video>
+            <div class="camera-actions">
+              <button type="button" class="btn btn-secondary" (click)="closeCamera()">Cancel</button>
+              <button type="button" class="btn btn-primary" (click)="capturePhoto()">Capture</button>
+            </div>
+          </div>
+        </div>
+      }
+      @if (imageDataUrls.length) {
+        <div class="preview-list">
+          @for (url of imageDataUrls; track url; let i = $index) {
+            <div class="preview-item">
+              <img [src]="url" alt="Preview" />
+              <button type="button" class="remove-btn" (click)="removeImage(i)" [disabled]="submitting" aria-label="Remove">×</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting">
+        {{ submitting ? 'Submitting…' : 'Submit' }}
+      </button>
+    </div>
+
+    @if (submitMessage === 'success') {
+      <p class="message success">Saved. Synced with API.</p>
+    }
+    @if (submitMessage === 'offline') {
+      <p class="message offline">Saved offline. Will sync when connected.</p>
+    }
+    @if (submitMessage === 'error') {
+      <p class="message error">Saved locally. Sync failed; will retry when possible.</p>
+    }
+  </form>
+</section>

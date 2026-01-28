@@ -1,0 +1,28 @@
+<div class="app">
+  <header class="header">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="logo">
+      PWA Form
+    </a>
+    <nav>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Form</a>
+      <a routerLink="/submissions" routerLinkActive="active">Submissions</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="btn-sync" (click)="sync.trySync()" [disabled]="sync.isSyncing() || !connectivity.isOnline()">
+        Sync now
+      </button>
+      <div class="status" [class.offline]="!connectivity.isOnline()" [class.syncing]="sync.isSyncing()">
+        @if (sync.isSyncing()) {
+          <span>Syncing…</span>
+        } @else if (connectivity.isOnline()) {
+          <span class="online">Online</span>
+        } @else {
+          <span class="offline">Offline</span>
+        }
+      </div>
+    </div>
+  </header>
+  <main class="main">
+    <router-outlet />
+  </main>
+</div>
